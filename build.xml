@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     06-Mar-2014 9:49:19 pm                                                        
+
+     login-registration    
+     It offers registration services and login services for any web application.
+                   
+     pradyot                                                                
+     ====================================================================== -->
+<project name="login-registration" default="default">
+    <description>
+            It offers registration services and login services for any web application.
+    </description>
+
+	<property file="build.properties"></property>
+	<property name="src_dir" value="src"/>
+	<property name="web_dir" value="war"/>
+	<property name="build_dir" value="${web_dir}/WEB-INF/classes"/>
+	<property name="web_app_name" value="login-registration"/>
+
+	<path id="master-classpath">
+		<fileset dir="${web_dir}/WEB-INF/lib" id="master_classpath_lib_dir_id">
+    		<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${app_server_lib}" id="master_classpath_appserver_lib_dir_id">
+    		<include name="servlet*.jar"/>
+		</fileset>
+		<pathelement path="${build_dir}"/>
+	</path>
+	
+	<path id="catalina-ant-classpath">
+		<fileset dir="${app_server_lib}">
+			<include name="catalina-ant.jar"/>
+		</fileset>
+	</path>
+    
+	<!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default" depends="no_dependency" description="It offers registration services and login services for any web application.">
+        <echo>${web_app_name} build file</echo>
+    	<echo>---------------------------------</echo>
+    	<echo>build	---	To build the web application.</echo>
+    	<echo>deploy	---	To deploy the web application as a directory.</echo>
+    	<echo>deploywar	---	To deploy the web application as a war file.</echo>
+    	<echo>install	---	To install the application in tomcat container.</echo>
+    	<echo>reload	---	To reload the application in tomcat container.</echo>
+    	<echo>start	---	To start the tomcat container.</echo>
+    	<echo>stop	---	To stop the tomcat container.</echo>
+    	<echo>list	---	To list the application in tomcat container.</echo>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: no_dependency                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="no_dependency">
+            
+    </target>
+
+
+	<!-- ================================= 
+          target: build              
+         ================================= -->
+    <target name="build" depends="no_dependency" description="Complie main source tree java files.">
+        <mkdir dir="${build_dir}"/>
+    	<javac  destdir="${build_dir}"
+         		debug="true"
+    			source="1.5"
+    			target="1.5"
+    			deprecation="false"
+    			optimize="false"
+    			failonerror="true"
+    			includeantruntime="false">
+    		<src path="${src_dir}"/>	
+    		<classpath refid = "master-classpath"/>
+    	</javac>
+    </target>
+
+	<!-- ================================= 
+          target: deploy              
+         ================================= -->
+    <target name="deploy" depends="build" description="Deploy web application.">
+        <copy todir="${deploy_path}/${web_app_name}" preservelastmodified="true">
+        	<fileset dir="${web_dir}">
+    			<include name="**/*.*"/>
+			</fileset>
+        </copy>
+    </target>
+
+	<!-- ================================= 
+          target: deploywar              
+         ================================= -->
+    <target name="deploywar" depends="build" description="Deploy web application as WAR file.">
+        <war destfile="${web_app_name}.war" webxml="${web_dir}/WEB-INF/web.xml">
+        	<fileset dir="${web_dir}">
+        		<include name="**/*.*"/>
+        	</fileset>
+        </war>
+    	<copy todir="${deploy_path}" preservelastmodified="true">
+    		<fileset dir=".">
+    	    	<include name="*.war"/>
+    		</fileset>
+    	</copy>
+    </target>
+	
+	<!-- ================================= 
+	          target: start              
+	     ================================= -->
+	<target name="start" depends="no_dependency" description="Start tomcat container.">
+		<start url="${tomcat_manager_url}"
+			username="${tomcat_manager_username}"
+		    password="${tomcat_manager_username}"
+		    path="/${web_app_name}"/>
+	</target>
+	
+	<!-- ================================= 
+          target: stop              
+         ================================= -->
+    <target name="stop" depends="no_dependency" description="Stop tomcat container.">
+    	<stop url="${tomcat_manager_url}"
+    		username="${tomcat_manager_username}"
+    		password="${tomcat_manager_username}"
+    		path="/${web_app_name}"/>
+    </target>
+	
+	<!-- ================================= 
+          target: list              
+         ================================= -->
+    <target name="list" depends="no_dependency" description="List tomcat container applications.">
+    	<list url="${tomcat_manager_url}"
+    		username="${tomcat_manager_username}"
+    		password="${tomcat_manager_username}"/>
+    </target>
+
+
+	<!-- ================================= 
+          target: install              
+         ================================= -->
+    <target name="install" depends="no_dependency" description="Install web application in tomcat container.">
+        <install url="${tomcat_manager_url}"
+        		username="${tomcat_manager_username}"
+        		password="${tomcat_manager_username}"
+        		path="/${web_app_name}"
+        		war="${web_app_name}"/>
+    </target>
+
+	<!-- ================================= 
+          target: reload              
+         ================================= -->
+    <target name="reload" depends="no_dependency" description="Reload the web application in tomcat container.">
+    	<reload url="${tomcat_manager_url}"
+    	        username="${tomcat_manager_username}"
+    	        password="${tomcat_manager_username}"
+    	        path="/${web_app_name}"/>
+    </target>
+
+	<taskdef name="start" classname="org.apache.catalina.ant.StartTask">
+		<classpath refid="catalina-ant-classpath" />
+	</taskdef>
+	
+	<taskdef name="stop" classname="org.apache.catalina.ant.StopTask">
+		<classpath refid="catalina-ant-classpath" />
+	</taskdef>
+	
+	<taskdef name="list" classname="org.apache.catalina.ant.ListTask">
+		<classpath refid="catalina-ant-classpath" />
+	</taskdef>
+	
+	<taskdef name="install" classname="org.apache.catalina.ant.StartTask">
+		<classpath refid="catalina-ant-classpath" />
+	</taskdef>
+	
+	<taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask">
+		<classpath refid="catalina-ant-classpath" />
+	</taskdef>
+	
+</project>
