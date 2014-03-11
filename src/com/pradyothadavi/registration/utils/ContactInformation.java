@@ -110,7 +110,14 @@ public class ContactInformation implements Serializable{
 	public void setPincode(String pincode) {
 		this.pincode = pincode;
 	}
-	
-	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ContactInformation [email=" + email + ", phoneNo=" + phoneNo
+				+ ", address=" + address + ", city=" + city + ", state="
+				+ state + ", country=" + country + ", pincode=" + pincode + "]";
+	}
 
 }
